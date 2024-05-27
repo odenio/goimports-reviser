@@ -285,7 +285,7 @@ func main() {
 		return
 	}
 
-	originPath := flag.Arg(0)
+	originPaths := flag.Args()
 
 	if filePath != "" {
 		deprecatedMessagesCh <- fmt.Sprintf("-%s is deprecated. Put file name(s) as last argument to the command(Example: goimports-reviser -rm-unused -set-alias -format goimports-reviser/main.go)", filePathArg)
@@ -365,7 +365,12 @@ func main() {
 				if err != nil {
 					log.Fatalf("Failed to find unformatted files %s: %+v\n", originPath, err)
 				}
-				fmt.Printf("%s\n", unformattedFiles.String())
+				if unformattedFiles != nil {
+					fmt.Printf("%s\n", unformattedFiles.String())
+					if *setExitStatus {
+						hasChange = true
+					}
+				}
 				continue
 			}
 			err := reviser.NewSourceDir(originProjectName, originPath, *isRecursive, excludes).Fix(options...)

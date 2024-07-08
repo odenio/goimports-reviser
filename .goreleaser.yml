@@ -2,7 +2,7 @@ env:
   - GO111MODULE=on
   - CGO_ENABLED=0
   - PROJECT_NAME=goimports-reviser
-  - PROJECT_USER=incu6us
+  - PROJECT_USER=odenio
 
 before:
   hooks:
@@ -28,15 +28,6 @@ builds:
     ldflags:
       - -s -w -X "main.Tag={{ .Tag }}" -X "main.Commit={{ .FullCommit }}" -X "main.SourceURL={{ .GitURL }}" -X "main.GoVersion={{ .Env.GO_VERSION }}"
 
-  - id: goimports-reviser-windows-amd64
-    binary: goimports-reviser
-    goos:
-      - windows
-    goarch:
-      - amd64
-    ldflags:
-      - -s -w -X "main.Tag={{ .Tag }}" -X "main.Commit={{ .FullCommit }}" -X "main.SourceURL={{ .GitURL }}" -X "main.GoVersion={{ .Env.GO_VERSION }}"
-
 checksum:
   name_template: "checksums.txt"
 
@@ -53,33 +44,5 @@ changelog:
 release:
   prerelease: auto
   github:
-    owner: incu6us
+    owner: odenio
     name: goimports-reviser
-
-brews:
-  - name: goimports-reviser
-    repository:
-      owner: incu6us
-      name: homebrew-tap
-    url_template: "https://github.com/{{ .Env.PROJECT_USER }}/{{ .ProjectName }}/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
-    commit_author:
-      name: incu6us
-      email: vyacheslavpryimak@gmail.com
-    folder: Formula
-    homepage: "https://github.com/incu6us/goimports-reviser"
-    description: "Right imports sorting & code formatting tool"
-    test: |
-      system "#{bin}/goimports-reviser -version"
-    install: |
-      bin.install "goimports-reviser"
-
-snapcrafts:
-  - id: goimports-reviser
-    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
-    publish: true
-    summary: "Right imports sorting & code formatting tool"
-    description: |
-      Tool for Golang to sort goimports by 3 groups: std, general and project dependencies. Also, formatting for your code will be prepared(so, you don't need to use gofmt or goimports separately).
-    grade: stable
-    confinement: strict
-    license: MIT

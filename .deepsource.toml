@@ -5,4 +5,4 @@ name = "go"
 enabled = false
 
   [analyzers.meta]
-  import_paths = ["github.com/incu6us/goimports-reviser"]
+  import_paths = ["github.com/odenio/goimports-reviser"]

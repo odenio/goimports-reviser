@@ -23,7 +23,7 @@ func TestGoModRootPathAndName(t *testing.T) {
 
 		got, err := Name(goModRootPath)
 		require.NoError(t, err)
-		assert.Equal(t, "github.com/incu6us/goimports-reviser/v3", got)
+		assert.Equal(t, "github.com/odenio/goimports-reviser/v3", got)
 	})
 
 	t.Run("path is not set error", func(t *testing.T) {
@@ -111,16 +111,16 @@ func TestDetermineProjectName(t *testing.T) {
 					return filepath.Join(dir, "module.go")
 				}(),
 			},
-			want: "github.com/incu6us/goimports-reviser/v3",
+			want: "github.com/odenio/goimports-reviser/v3",
 		},
 
 		{
 			name: "success with manual set",
 			args: args{
-				projectName: "github.com/incu6us/goimports-reviser/v3",
+				projectName: "github.com/odenio/goimports-reviser/v3",
 				filePath:    "",
 			},
-			want: "github.com/incu6us/goimports-reviser/v3",
+			want: "github.com/odenio/goimports-reviser/v3",
 		},
 	}
 	for _, tt := range tests {

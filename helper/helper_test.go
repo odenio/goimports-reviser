@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/incu6us/goimports-reviser/v3/reviser"
+	"github.com/odenio/goimports-reviser/v3/reviser"
 )
 
 func TestDetermineProjectName(t *testing.T) {
@@ -36,7 +36,7 @@ func TestDetermineProjectName(t *testing.T) {
 				}(),
 				option: OSGetwdOption,
 			},
-			want: "github.com/incu6us/goimports-reviser/v3",
+			want: "github.com/odenio/goimports-reviser/v3",
 		},
 		{
 			name: "success with stdin",
@@ -45,7 +45,7 @@ func TestDetermineProjectName(t *testing.T) {
 				filePath:    reviser.StandardInput,
 				option:      OSGetwdOption,
 			},
-			want: "github.com/incu6us/goimports-reviser/v3",
+			want: "github.com/odenio/goimports-reviser/v3",
 		},
 		{
 			name: "fail with manual filepath",

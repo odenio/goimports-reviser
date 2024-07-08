@@ -12,8 +12,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/incu6us/goimports-reviser/v3/helper"
-	"github.com/incu6us/goimports-reviser/v3/reviser"
+	"github.com/odenio/goimports-reviser/v3/helper"
+	"github.com/odenio/goimports-reviser/v3/reviser"
 )
 
 const (

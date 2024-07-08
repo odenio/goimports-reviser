@@ -1,4 +1,4 @@
-module github.com/incu6us/goimports-reviser/v3
+module github.com/odenio/goimports-reviser/v3
 
 go 1.21
 

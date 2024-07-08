@@ -3,8 +3,8 @@ package helper
 import (
 	"os"
 
-	"github.com/incu6us/goimports-reviser/v3/pkg/module"
-	"github.com/incu6us/goimports-reviser/v3/reviser"
+	"github.com/odenio/goimports-reviser/v3/pkg/module"
+	"github.com/odenio/goimports-reviser/v3/reviser"
 )
 
 type Option func() (string, error)

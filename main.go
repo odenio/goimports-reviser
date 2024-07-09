@@ -201,6 +201,27 @@ func printUsage() {
 	flag.PrintDefaults()
 }
 
+func getMyself(deps []*debug.Module) *debug.Module {
+	myPath := "github.com/odenio/goimports-reviser"
+	for _, dep := range deps {
+		if dep == nil {
+			continue
+		}
+		if dep.Replace != nil && dep.Replace.Path == myPath {
+			return dep
+		}
+		if dep.Path == myPath {
+			return dep
+		}
+	}
+	return &debug.Module{
+		Path:    myPath,
+		Version: "(devel)",
+		Sum:     "",
+		Replace: nil,
+	}
+}
+
 func printVersion() {
 	if Tag != "" {
 		fmt.Printf(
@@ -218,7 +239,7 @@ func printVersion() {
 		log.Printf("Failed to read build info")
 		return
 	}
-	myself := bi.Deps[0]
+	myself := getMyself(bi.Deps)
 	fmt.Printf(
 		"version: %s\nbuilt with: %s\ntag: %s\ncommit: %s\nsource: %s\n",
 		strings.TrimPrefix(myself.Version, "v"),
@@ -239,7 +260,8 @@ func printVersionOnly() {
 		fmt.Println("(devel)")
 		return
 	}
-	fmt.Println(strings.TrimPrefix(bi.Deps[0].Version, "v"))
+	myself := getMyself(bi.Deps)
+	fmt.Println(strings.TrimPrefix(myself.Version, "v"))
 }
 
 func main() {

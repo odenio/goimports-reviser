@@ -10,6 +10,7 @@ import (
 	"os/user"
 	"path"
 	"path/filepath"
+	"runtime/debug"
 	"strings"
 
 	"github.com/odenio/goimports-reviser/v3/helper"
@@ -19,6 +20,7 @@ import (
 const (
 	projectNameArg         = "project-name"
 	versionArg             = "version"
+	versionOnlyArg         = "version-only"
 	removeUnusedImportsArg = "rm-unused"
 	setAliasArg            = "set-alias"
 	companyPkgPrefixesArg  = "company-prefixes"
@@ -46,6 +48,7 @@ var (
 	GoVersion string
 
 	shouldShowVersion           *bool
+	shouldShowVersionOnly       *bool
 	shouldRemoveUnusedImports   *bool
 	shouldSetAlias              *bool
 	shouldFormat                *bool
@@ -176,13 +179,18 @@ Optional parameter.`,
 		"Apply imports sorting and formatting(if the option is set) to generated files. Generated file is a file with first comment which starts with comment '// Code generated'. Optional parameter.",
 	)
 
-	if Tag != "" {
-		shouldShowVersion = flag.Bool(
-			versionArg,
-			false,
-			"Show version.",
-		)
-	}
+	shouldShowVersion = flag.Bool(
+		versionArg,
+		false,
+		"Show version information",
+	)
+
+	shouldShowVersionOnly = flag.Bool(
+		versionOnlyArg,
+		false,
+		"Show only the version string",
+	)
+
 }
 
 func printUsage() {
@@ -194,14 +202,44 @@ func printUsage() {
 }
 
 func printVersion() {
+	if Tag != "" {
+		fmt.Printf(
+			"version: %s\nbuilt with: %s\ntag: %s\ncommit: %s\nsource: %s\n",
+			strings.TrimPrefix(Tag, "v"),
+			GoVersion,
+			Tag,
+			Commit,
+			SourceURL,
+		)
+		return
+	}
+	bi, ok := debug.ReadBuildInfo()
+	if !ok {
+		log.Printf("Failed to read build info")
+		return
+	}
+	myself := bi.Deps[0]
 	fmt.Printf(
-		"version: %s\nbuild with: %s\ntag: %s\ncommit: %s\nsource: %s\n",
-		strings.TrimPrefix(Tag, "v"),
-		GoVersion,
-		Tag,
-		Commit,
-		SourceURL,
+		"version: %s\nbuilt with: %s\ntag: %s\ncommit: %s\nsource: %s\n",
+		strings.TrimPrefix(myself.Version, "v"),
+		bi.GoVersion,
+		myself.Version,
+		"n/a",
+		"https://github.com/odenio/goimports-reviser",
 	)
+}
+
+func printVersionOnly() {
+	if Tag != "" {
+		fmt.Println(strings.TrimPrefix(Tag, "v"))
+		return
+	}
+	bi, ok := debug.ReadBuildInfo()
+	if !ok {
+		fmt.Println("(devel)")
+		return
+	}
+	fmt.Println(strings.TrimPrefix(bi.Deps[0].Version, "v"))
 }
 
 func main() {
@@ -209,7 +247,16 @@ func main() {
 	flag.Parse()
 
 	if shouldShowVersion != nil && *shouldShowVersion {
+		if shouldShowVersionOnly != nil && *shouldShowVersionOnly {
+			printVersionOnly()
+			return
+		}
 		printVersion()
+		return
+	}
+
+	if shouldShowVersionOnly != nil && *shouldShowVersionOnly {
+		printVersionOnly()
 		return
 	}
 

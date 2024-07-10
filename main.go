@@ -201,25 +201,27 @@ func printUsage() {
 	flag.PrintDefaults()
 }
 
-func getMyself(deps []*debug.Module) *debug.Module {
-	myPath := "github.com/odenio/goimports-reviser"
-	for _, dep := range deps {
-		if dep == nil {
-			continue
-		}
-		if dep.Replace != nil && dep.Replace.Path == myPath {
-			return dep
-		}
-		if dep.Path == myPath {
-			return dep
+func getBuildInfo() *debug.BuildInfo {
+	bi, ok := debug.ReadBuildInfo()
+	if !ok {
+		return nil
+	}
+	return bi
+}
+
+func getMyModuleInfo(bi *debug.BuildInfo) (*debug.Module, error) {
+	if bi == nil {
+		return nil, fmt.Errorf("no build info available")
+	}
+	if bi.Main.Path != "" {
+		return &bi.Main, nil
+	}
+	for _, m := range bi.Deps {
+		if strings.HasPrefix(m.Path, "github.com/odenio/goimports-reviser") {
+			return m, nil
 		}
 	}
-	return &debug.Module{
-		Path:    myPath,
-		Version: "(devel)",
-		Sum:     "",
-		Replace: nil,
-	}
+	return nil, fmt.Errorf("weird: no matching dependency found in build info")
 }
 
 func printVersion() {
@@ -234,19 +236,18 @@ func printVersion() {
 		)
 		return
 	}
-	bi, ok := debug.ReadBuildInfo()
-	if !ok {
-		log.Printf("Failed to read build info")
-		return
+	bi := getBuildInfo()
+	myModule, err := getMyModuleInfo(bi)
+	if err != nil {
+		log.Fatalf("failed to get my module info: %s", err)
 	}
-	myself := getMyself(bi.Deps)
 	fmt.Printf(
 		"version: %s\nbuilt with: %s\ntag: %s\ncommit: %s\nsource: %s\n",
-		strings.TrimPrefix(myself.Version, "v"),
+		strings.TrimPrefix(myModule.Version, "v"),
 		bi.GoVersion,
-		myself.Version,
+		myModule.Version,
 		"n/a",
-		"https://github.com/odenio/goimports-reviser",
+		myModule.Path,
 	)
 }
 
@@ -255,13 +256,12 @@ func printVersionOnly() {
 		fmt.Println(strings.TrimPrefix(Tag, "v"))
 		return
 	}
-	bi, ok := debug.ReadBuildInfo()
-	if !ok {
-		fmt.Println("(devel)")
-		return
+	bi := getBuildInfo()
+	myModule, err := getMyModuleInfo(bi)
+	if err != nil {
+		log.Fatalf("failed to get my module info: %s", err)
 	}
-	myself := getMyself(bi.Deps)
-	fmt.Println(strings.TrimPrefix(myself.Version, "v"))
+	fmt.Println(strings.TrimPrefix(myModule.Version, "v"))
 }
 
 func main() {
